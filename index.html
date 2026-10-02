@@ -86,6 +86,27 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 .weekly-input:focus{outline:2px solid #dfe8ff;border-color:#8ba7f7}
 .weekly-actions{display:flex;gap:6px;flex-wrap:wrap}
 .pdf-btn{background:#172236!important;color:#fff!important}
+.project-visual-grid{display:grid;grid-template-columns:1fr 1fr 1.25fr;gap:14px;margin:14px 0}
+.project-chart{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);overflow:hidden}
+.project-chart-body{padding:17px 18px 19px}
+.project-timeline{display:flex;flex-direction:column;gap:14px}
+.project-time-row{display:grid;grid-template-columns:minmax(120px,1.1fr) minmax(130px,1.6fr) 72px;gap:10px;align-items:center}
+.project-time-name{font-size:11px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.project-time-track{height:11px;background:#edf1f6;border-radius:999px;overflow:hidden;position:relative}
+.project-time-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#2f63e9,#7c9df4)}
+.project-time-fill.done{background:linear-gradient(90deg,#219a6a,#74c8a7)}
+.project-time-fill.warn{background:linear-gradient(90deg,#d77a1e,#f0b66f)}
+.project-time-date{font-size:10px;color:var(--muted);text-align:right}
+.project-overview-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:12px}
+.project-mini{padding:11px 12px;border-radius:14px;background:#f8fafc;border:1px solid var(--line)}
+.project-mini b{display:block;font-size:20px;margin-bottom:3px}
+.project-mini span{font-size:10px;color:var(--muted)}
+.range-panel{background:linear-gradient(135deg,#f8fbff,#eef4ff);border:1px solid #dfe8fb;border-radius:18px;padding:13px 15px;margin-bottom:14px}
+.range-panel .range-row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.range-panel select,.range-panel input{border:1px solid #dce4ef;background:#fff;border-radius:10px;padding:9px 10px}
+@media(max-width:1100px){.project-visual-grid{grid-template-columns:1fr 1fr}.project-visual-grid .project-chart:last-child{grid-column:1/-1}}
+@media(max-width:700px){.project-visual-grid{grid-template-columns:1fr}.project-visual-grid .project-chart:last-child{grid-column:auto}.project-time-row{grid-template-columns:1fr}.project-time-date{text-align:left}.project-overview-strip{grid-template-columns:1fr 1fr}}
+
 .loading{position:fixed;inset:0;background:rgba(255,255,255,.74);display:none;align-items:center;justify-content:center;z-index:100;font-weight:900;color:var(--blue)}.loading.show{display:flex}
 @media(max-width:1100px){.cards{grid-template-columns:repeat(3,1fr)}.grid3{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
 @media(max-width:780px){.app{grid-template-columns:1fr}.side{position:fixed;left:-250px;width:236px;transition:.25s}.side.show{left:0}.main{padding:17px 14px 38px}.mobile{display:inline-block}.top{flex-wrap:wrap}.actions{width:100%}.search{min-width:0;flex:1}.cards{grid-template-columns:1fr 1fr}.grid3,.settings-grid{grid-template-columns:1fr}.hero-row{align-items:flex-start;flex-direction:column}.donut-wrap{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}}
@@ -134,33 +155,13 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
     </div>
   </div>
 
-  <div class="panel" style="margin-bottom:15px;overflow:visible">
-    <div style="padding:12px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-      <b style="font-size:12px">顯示期間</b>
-      <select id="periodMode" style="border:1px solid var(--line);border-radius:10px;padding:9px 10px">
-        <option value="thisWeek">本週</option>
-        <option value="lastWeek">上週</option>
-        <option value="thisMonth">本月</option>
-        <option value="week">指定週</option>
-        <option value="custom">自訂日期區間</option>
-      </select>
-      <input type="week" id="weekPicker" style="display:none;border:1px solid var(--line);border-radius:10px;padding:8px 10px">
-      <div id="customRange" style="display:none;gap:7px;align-items:center">
-        <input type="date" id="rangeStart" style="border:1px solid var(--line);border-radius:10px;padding:8px 10px">
-        <span style="font-size:12px;color:var(--muted)">至</span>
-        <input type="date" id="rangeEnd" style="border:1px solid var(--line);border-radius:10px;padding:8px 10px">
-      </div>
-      <button class="btn primary" onclick="applyPeriod()">套用</button>
-      <span class="badge blue" id="periodLabel"></span>
-    </div>
-  </div>
 
   <section id="dashboard" class="view active">
-    <div class="hero"><div class="hero-row"><div><h2>期間工作概況</h2><p id="heroSummary"></p></div><div class="week" id="weekNo"></div></div></div>
+    <div class="hero"><div class="hero-row"><div><h2>工作全貌</h2><p id="heroSummary"></p></div><div class="week" id="weekNo">全部資料</div></div></div>
     <div class="cards" id="kpiCards"></div>
     <div class="grid2">
-      <div class="panel"><div class="ph"><div><h3>期間每日工作量</h3><p>依建立日期統計</p></div><span class="badge blue" id="weekCountBadge"></span></div><div class="chartbox"><div class="bar-chart" id="weekBar"></div></div></div>
-      <div class="panel"><div class="ph"><div><h3>本週工作結構</h3><p>依工作分類分布</p></div></div><div class="chartbox" id="donutBox"></div></div>
+      <div class="panel"><div class="ph"><div><h3>最近 6 個月工作量</h3><p>依工作建立月份統計</p></div><span class="badge blue" id="weekCountBadge"></span></div><div class="chartbox"><div class="bar-chart" id="weekBar"></div></div></div>
+      <div class="panel"><div class="ph"><div><h3>工作狀態分布</h3><p>全部工作目前狀態</p></div></div><div class="chartbox" id="donutBox"></div></div>
     </div>
     <div class="grid3">
       <div class="panel"><div class="ph"><div><h3>工作來源分析</h3><p>會議與交辦來源</p></div></div><div class="source-bars" id="sourceBars"></div></div>
@@ -175,6 +176,26 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
       <button class="btn light" onclick="saveAllWeeklyRows()">儲存全部進度</button>
       <button class="btn pdf-btn" onclick="exportWeeklyPdf()">匯出完整 PDF</button>
     </div></div>
+    <div class="range-panel">
+      <div class="range-row">
+        <b style="font-size:12px">週報期間</b>
+        <select id="periodMode">
+          <option value="thisWeek">本週</option>
+          <option value="lastWeek">上週</option>
+          <option value="thisMonth">本月</option>
+          <option value="week">指定週</option>
+          <option value="custom">自訂日期區間</option>
+        </select>
+        <input type="week" id="weekPicker" style="display:none">
+        <div id="customRange" style="display:none;gap:7px;align-items:center">
+          <input type="date" id="rangeStart">
+          <span style="font-size:12px;color:var(--muted)">至</span>
+          <input type="date" id="rangeEnd">
+        </div>
+        <button class="btn primary" onclick="applyPeriod()">套用週報期間</button>
+        <span class="badge blue" id="periodLabel"></span>
+      </div>
+    </div>
     <div class="cards" id="weeklyKpis"></div>
     <div class="grid2">
       <div class="panel"><div class="ph"><div><h3>主任摘要</h3><p>儲存後寫入 Google Sheets</p></div></div><div class="mb"><textarea id="weeklySummary" style="width:100%;min-height:110px;border:1px solid var(--line);border-radius:11px;padding:11px"></textarea><div style="text-align:right;margin-top:8px"><button class="btn primary" onclick="saveWeeklySummary()">儲存摘要</button></div></div></div>
@@ -190,31 +211,56 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
   </section>
 
   <section id="tracking" class="view">
-    <div class="section-title"><div><h2>待追蹤中心</h2><p>等待回覆、逾期與跨週事項。</p></div></div>
+    <div class="section-title"><div><h2>待追蹤中心</h2><p>完整彙整等待回覆、待追蹤與逾期事項。</p></div></div>
     <div class="cards" id="trackingKpis"></div>
     <div class="panel"><div class="ph"><div><h3>追蹤清單</h3></div></div><div class="list" id="trackingList"></div></div>
   </section>
 
   <section id="meetings" class="view">
-    <div class="section-title"><div><h2>會議管理</h2><p>建立會議，並快速產生衍生工作。</p></div><button class="btn primary" onclick="openMeeting()">＋ 新增會議</button></div>
+    <div class="section-title"><div><h2>會議管理</h2><p>全部會議集中管理；未來會議優先，其後依日期排序。</p></div><button class="btn primary" onclick="openMeeting()">＋ 新增會議</button></div>
     <div class="grid3" id="meetingCards"></div>
   </section>
 
 
   <section id="projects" class="view">
-    <div class="section-title"><div><h2>專案管理</h2><p>管理跨週、跨月或具明確里程碑的專案工作。</p></div><button class="btn primary" onclick="openProject()">＋ 新增專案</button></div>
+    <div class="section-title"><div><h2>專案管理</h2><p>全部專案集中管理，依執行狀態與預計完成日排序。</p></div><button class="btn primary" onclick="openProject()">＋ 新增專案</button></div>
     <div class="cards" id="projectKpis"></div>
+
+    <div class="project-visual-grid">
+      <div class="project-chart">
+        <div class="ph"><div><h3>專案狀態分布</h3><p>規劃、進行、追蹤與完成</p></div></div>
+        <div class="project-chart-body" id="projectStatusDonut"></div>
+      </div>
+
+      <div class="project-chart">
+        <div class="ph"><div><h3>專案分類分布</h3><p>依專案類型統計</p></div></div>
+        <div class="source-bars" id="projectCategoryBars"></div>
+      </div>
+
+      <div class="project-chart">
+        <div class="ph"><div><h3>專案時程</h3><p>依起訖日期顯示時程經過率</p></div><span class="badge blue">全部專案</span></div>
+        <div class="project-chart-body">
+          <div class="project-timeline" id="projectTimeline"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:14px">
+      <div class="ph"><div><h3>近期里程碑／預計完成</h3><p>未完成專案依預計完成日由近到遠</p></div></div>
+      <div class="list" id="projectMilestones"></div>
+    </div>
+
     <div class="table-wrap"><table><thead><tr><th>專案名稱</th><th>分類</th><th>期間</th><th>狀態</th><th>目前進度</th><th>下一步</th><th>操作</th></tr></thead><tbody id="projectTable"></tbody></table></div>
   </section>
 
   <section id="coursesTeach" class="view">
-    <div class="section-title"><div><h2>課程管理｜授課</h2><p>記錄院內外授課、講師任務、教材與時數。</p></div><button class="btn primary" onclick="openCourse('授課')">＋ 新增授課</button></div>
+    <div class="section-title"><div><h2>課程管理｜授課</h2><p>顯示全部授課紀錄，依日期由新到舊排序。</p></div><button class="btn primary" onclick="openCourse('授課')">＋ 新增授課</button></div>
     <div class="cards" id="teachKpis"></div>
     <div class="table-wrap"><table><thead><tr><th>課程名稱</th><th>日期</th><th>時數</th><th>主辦 / 對象</th><th>地點</th><th>狀態</th><th>操作</th></tr></thead><tbody id="teachTable"></tbody></table></div>
   </section>
 
   <section id="coursesLearn" class="view">
-    <div class="section-title"><div><h2>課程管理｜聽課</h2><p>記錄受訓、研習、外部課程與學習時數。</p></div><button class="btn primary" onclick="openCourse('聽課')">＋ 新增聽課</button></div>
+    <div class="section-title"><div><h2>課程管理｜聽課</h2><p>顯示全部受訓與研習紀錄，依日期由新到舊排序。</p></div><button class="btn primary" onclick="openCourse('聽課')">＋ 新增聽課</button></div>
     <div class="cards" id="learnKpis"></div>
     <div class="table-wrap"><table><thead><tr><th>課程名稱</th><th>日期</th><th>時數</th><th>主辦單位</th><th>地點</th><th>狀態</th><th>操作</th></tr></thead><tbody id="learnTable"></tbody></table></div>
   </section>
@@ -335,6 +381,43 @@ function getWeekIdFromDate(d){
  return `${y}-W${String(w).padStart(2,"0")}`;
 }
 function isOverdue(t){return !["已完成","封存"].includes(t.status)&&t.dueDate&&new Date(t.dueDate+"T23:59:59")<today}
+function sortTasksAll(arr){
+ const rank={"緊急":0,"重要":1,"一般":2};
+ const statusRank={"處理中":0,"待追蹤":1,"等待回覆":2,"待處理":3,"已完成":8,"封存":9};
+ return arr.slice().sort((a,b)=>{
+   const sa=statusRank[a.status]??5,sb=statusRank[b.status]??5;if(sa!==sb)return sa-sb;
+   const pa=rank[a.priority]??3,pb=rank[b.priority]??3;if(pa!==pb)return pa-pb;
+   const da=a.dueDate||"9999-12-31",db=b.dueDate||"9999-12-31";if(da!==db)return da.localeCompare(db);
+   return (b.createDate||"").localeCompare(a.createDate||"");
+ });
+}
+function sortMeetingsAll(arr){
+ const td=fmtDate(today);
+ return arr.slice().sort((a,b)=>{
+   const af=(a.date||"")>=td,bf=(b.date||"")>=td;
+   if(af!==bf)return af?-1:1;
+   if(af)return (a.date||"9999").localeCompare(b.date||"9999");
+   return (b.date||"").localeCompare(a.date||"");
+ });
+}
+function sortProjectsAll(arr){
+ const sr={"進行中":0,"待追蹤":1,"規劃中":2,"暫停":3,"已完成":9};
+ return arr.slice().sort((a,b)=>{
+   const sa=sr[a.status]??5,sb=sr[b.status]??5;if(sa!==sb)return sa-sb;
+   return (a.endDate||"9999-12-31").localeCompare(b.endDate||"9999-12-31");
+ });
+}
+function sortCoursesAll(arr){
+ return arr.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+}
+function taskInReportRange(t){
+ if(!t.weeklyReport || t.status==="封存")return false;
+ const inCreate=t.createDate&&periodDate(t.createDate);
+ const inDue=t.dueDate&&periodDate(t.dueDate);
+ const ongoing=!["已完成","封存"].includes(t.status);
+ return !!(inCreate||inDue||ongoing);
+}
+
 function statusBadge(s){let c=s==="已完成"?"green":s==="待追蹤"?"purple":s==="等待回覆"?"orange":s==="待處理"?"blue":"";return `<span class="badge ${c}">${s}</span>`}
 function priBadge(p){let c=p==="緊急"?"red":p==="重要"?"orange":"";return `<span class="badge ${c}">${p||"一般"}</span>`}
 function escapeHtml(value){
@@ -355,7 +438,7 @@ async function loadAll(){
  finally{loading(false)}
 }
 function render(){
- document.getElementById("weekText").textContent=`${fmtDate(periodStart)} – ${fmtDate(periodEnd)}｜工作、會議、專案、課程與主任週報`;
+ document.getElementById("weekText").textContent="工作、會議、專案、課程與主任週報整合管理";
  document.getElementById("periodLabel").textContent=`${fmtDate(periodStart)} ～ ${fmtDate(periodEnd)}`;
  renderFilters();renderDashboard();renderWeekly();renderTasks();renderTracking();renderMeetings();renderProjects();renderCourses();renderSettings();
 }
@@ -366,32 +449,40 @@ function renderFilters(){
  a.value=as;b.value=bs;
 }
 function renderDashboard(){
- const wk=tasks.filter(t=>inPeriod(t.createDate)),done=wk.filter(t=>t.status==="已完成").length,active=tasks.filter(t=>["待處理","處理中"].includes(t.status)).length,follow=tasks.filter(t=>["待追蹤","等待回覆"].includes(t.status)).length,od=tasks.filter(isOverdue).length,rate=wk.length?Math.round(done/wk.length*100):0;
- document.getElementById("weekNo").textContent=document.getElementById("periodMode").selectedOptions[0].textContent;
- document.getElementById("heroSummary").textContent=`期間新增 ${wk.length} 項工作，已完成 ${done} 項，完成率 ${rate}%；目前尚有 ${follow} 項待追蹤，${od} 項逾期。`;
- document.getElementById("kpiCards").innerHTML=[["本週新增",wk.length,"期間建立"],["本週完成",done,`完成率 ${rate}%`],["進行中",active,"待處理 / 處理中"],["待追蹤",follow,"含等待回覆"],["逾期",od,"需優先處理"]].map(x=>`<div class="kpi"><div class="label">${x[0]}</div><div class="value">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join("");
- document.getElementById("weekCountBadge").textContent=`期間 ${wk.length} 項`;
- const counts=[0,0,0,0,0,0,0];wk.forEach(t=>counts[(new Date(t.createDate+"T00:00:00").getDay()+6)%7]++);
- const max=Math.max(1,...counts),days=["一","二","三","四","五","六","日"];
- document.getElementById("weekBar").innerHTML=counts.map((n,i)=>`<div class="bar-col"><div class="bar-wrap"><div class="bar" style="height:${Math.max(7,n/max*100)}%"><span class="n">${n}</span></div></div><small>${days[i]}</small></div>`).join("");
- renderDonut("donutBox",wk,"category");renderSourceBars(wk);
- const im=tasks.filter(t=>!["已完成","封存"].includes(t.status)).sort((a,b)=>(a.dueDate||"9999").localeCompare(b.dueDate||"9999")).slice(0,5);
- document.getElementById("importantList").innerHTML=im.length?im.map(t=>`<div class="item"><div><h4>${t.title}</h4><div class="meta">${statusBadge(t.status)}${priBadge(t.priority)}<span class="badge">${t.source}</span></div></div><div class="date">${dateZH(t.dueDate)}</div></div>`).join(""):'<div class="empty">目前沒有待辦事項</div>';
- document.getElementById("meetingListMini").innerHTML=meetings.filter(m=>periodDate(m.date)).slice().sort((a,b)=>a.date.localeCompare(b.date)).slice(0,4).map(m=>`<div class="item"><div><h4>${m.name}</h4><div class="meta"><span class="badge blue">${m.room||"未設定地點"}</span></div></div><div class="date">${dateZH(m.date)}</div></div>`).join("");
+ const all=tasks.slice(),done=all.filter(t=>t.status==="已完成").length,active=all.filter(t=>["待處理","處理中"].includes(t.status)).length,follow=all.filter(t=>["待追蹤","等待回覆"].includes(t.status)).length,od=all.filter(isOverdue).length,rate=all.length?Math.round(done/all.length*100):0;
+ document.getElementById("weekNo").textContent="全部資料";
+ document.getElementById("heroSummary").textContent=`目前共管理 ${all.length} 項工作，已完成 ${done} 項，整體完成率 ${rate}%；進行中 ${active} 項、待追蹤 ${follow} 項、逾期 ${od} 項。`;
+ document.getElementById("kpiCards").innerHTML=[["全部工作",all.length,"累計工作事項"],["已完成",done,`整體完成率 ${rate}%`],["進行中",active,"待處理 / 處理中"],["待追蹤",follow,"含等待回覆"],["逾期",od,"需優先處理"]].map(x=>`<div class="kpi"><div class="label">${x[0]}</div><div class="value">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join("");
+
+ const months=[];
+ const base=new Date(today.getFullYear(),today.getMonth(),1);
+ for(let i=5;i>=0;i--){const d=new Date(base.getFullYear(),base.getMonth()-i,1);months.push({key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`,label:`${d.getMonth()+1}月`,n:0})}
+ all.forEach(t=>{const k=(t.createDate||"").slice(0,7);const m=months.find(x=>x.key===k);if(m)m.n++});
+ const max=Math.max(1,...months.map(x=>x.n));
+ document.getElementById("weekCountBadge").textContent=`累計 ${all.length} 項`;
+ document.getElementById("weekBar").innerHTML=months.map(m=>`<div class="bar-col"><div class="bar-wrap"><div class="bar" style="height:${Math.max(7,m.n/max*100)}%"><span class="n">${m.n}</span></div></div><small>${m.label}</small></div>`).join("");
+
+ renderDonut("donutBox",all,"status");renderSourceBars(all);
+
+ const im=sortTasksAll(all.filter(t=>!["已完成","封存"].includes(t.status))).slice(0,6);
+ document.getElementById("importantList").innerHTML=im.length?im.map(t=>`<div class="item"><div><h4>${escapeHtml(t.title)}</h4><div class="meta">${statusBadge(t.status)}${priBadge(t.priority)}<span class="badge">${escapeHtml(t.source)}</span></div></div><div class="date">${dateZH(t.dueDate)}</div></div>`).join(""):'<div class="empty">目前沒有待辦事項</div>';
+
+ const ms=sortMeetingsAll(meetings).slice(0,5);
+ document.getElementById("meetingListMini").innerHTML=ms.length?ms.map(m=>`<div class="item"><div><h4>${escapeHtml(m.name)}</h4><div class="meta"><span class="badge blue">${escapeHtml(m.room||"未設定地點")}</span><span class="badge">${escapeHtml(m.status||"")}</span></div></div><div class="date">${dateZH(m.date)}</div></div>`).join(""):'<div class="empty">尚無會議</div>';
 }
 function renderDonut(id,arr,key){
  const c={};arr.forEach(x=>c[x[key]]=(c[x[key]]||0)+1);const es=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,4),total=es.reduce((s,x)=>s+x[1],0),colors=["#2f63e9","#219a6a","#d77a1e","#7862dc"];let cur=0,parts=[];
  es.forEach((e,i)=>{let p=total?e[1]/total*100:0;parts.push(`${colors[i]} ${cur}% ${cur+p}%`);cur+=p});
- document.getElementById(id).innerHTML=!es.length?'<div class="empty">尚無資料</div>':`<div class="donut-wrap"><div style="position:relative"><div class="donut" style="background:conic-gradient(${parts.join(",")})"></div><div class="donut-center"><div><b>${total}</b><span>本週事項</span></div></div></div><div class="legend">${es.map((e,i)=>`<div class="legend-row"><span class="dot" style="background:${colors[i]}"></span><span>${e[0]}</span><b>${e[1]}</b></div>`).join("")}</div></div>`;
+ document.getElementById(id).innerHTML=!es.length?'<div class="empty">尚無資料</div>':`<div class="donut-wrap"><div style="position:relative"><div class="donut" style="background:conic-gradient(${parts.join(",")})"></div><div class="donut-center"><div><b>${total}</b><span>資料筆數</span></div></div></div><div class="legend">${es.map((e,i)=>`<div class="legend-row"><span class="dot" style="background:${colors[i]}"></span><span>${e[0]}</span><b>${e[1]}</b></div>`).join("")}</div></div>`;
 }
 function renderSourceBars(arr){
  const c={};arr.forEach(t=>c[t.source]=(c[t.source]||0)+1);const es=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,6),max=Math.max(1,...es.map(x=>x[1]));
  document.getElementById("sourceBars").innerHTML=es.length?es.map(e=>`<div class="srow"><span>${e[0]}</span><div class="track"><div class="fill" style="width:${e[1]/max*100}%"></div></div><b>${e[1]}</b></div>`).join(""):'<div class="empty">尚無資料</div>';
 }
 function renderWeekly(){
- const rpt=tasks.filter(t=>t.weeklyReport&&!["封存"].includes(t.status)),done=rpt.filter(t=>t.status==="已完成").length,follow=rpt.filter(t=>["待追蹤","等待回覆"].includes(t.status)).length,od=rpt.filter(isOverdue).length,rate=rpt.length?Math.round(done/rpt.length*100):0;
+ const rpt=sortTasksAll(tasks.filter(taskInReportRange)),done=rpt.filter(t=>t.status==="已完成").length,follow=rpt.filter(t=>["待追蹤","等待回覆"].includes(t.status)).length,od=rpt.filter(isOverdue).length,rate=rpt.length?Math.round(done/rpt.length*100):0;
  document.getElementById("weeklyKpis").innerHTML=[["列入週報",rpt.length,"週報重點"],["已完成",done,`完成率 ${rate}%`],["待追蹤",follow,"持續追蹤"],["逾期",od,"需掌握"],["會議相關",rpt.filter(t=>t.source!=="其他").length,"會議 / 交辦"]].map(x=>`<div class="kpi"><div class="label">${x[0]}</div><div class="value">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join("");
- document.getElementById("weeklySummary").value=weeklySummary||`本週共列入週報 ${rpt.length} 項工作，已完成 ${done} 項，完成率 ${rate}%。目前尚有 ${follow} 項待追蹤，${od} 項逾期。`;
+ document.getElementById("weeklySummary").value=weeklySummary||`所選期間共列入週報 ${rpt.length} 項工作，已完成 ${done} 項，完成率 ${rate}%。目前尚有 ${follow} 項待追蹤，${od} 項逾期。`;
  renderDonut("weeklyDonut",rpt,"category");
  document.getElementById("weeklyTable").innerHTML=rpt.length?rpt.map(t=>`<tr>
  <td><b>${t.title}</b><div style="margin-top:5px">${priBadge(t.priority)}</div></td>
@@ -404,17 +495,18 @@ function renderWeekly(){
 }
 function renderTasks(){
  const q=(taskSearch.value||"").toLowerCase(),st=statusFilter.value,so=sourceFilter.value,ca=categoryFilter.value;
- const arr=tasks.filter(t=>(!q||(t.title+t.note+t.weekProgress+t.nextAction+t.source+t.category).toLowerCase().includes(q))&&(!st||t.status===st)&&(!so||t.source===so)&&(!ca||t.category===ca));
+ const arr=sortTasksAll(tasks.filter(t=>(!q||(t.title+t.note+t.weekProgress+t.nextAction+t.source+t.category).toLowerCase().includes(q))&&(!st||t.status===st)&&(!so||t.source===so)&&(!ca||t.category===ca)));
  taskTable.innerHTML=arr.length?arr.map(t=>`<tr><td><b>${t.title}</b><br><span style="color:#8a95a7;font-size:10px">${t.note||""}</span></td><td>${t.category}</td><td>${t.source}</td><td>${statusBadge(t.status)}</td><td>${dateZH(t.dueDate)} ${isOverdue(t)?'<span class="badge red">逾期</span>':''}</td><td>${t.weeklyReport?'<span class="badge green">是</span>':'—'}</td><td><div class="actions-cell"><button class="mini blue" onclick="editTask('${t.id}')">編輯</button><button class="mini" onclick="completeTask('${t.id}')">完成</button></div></td></tr>`).join(""):'<tr><td colspan="7">沒有符合條件的資料</td></tr>';
- dataTable.innerHTML=tasks.map(t=>`<tr><td><b>${t.title}</b></td><td>${t.category}</td><td>${t.source}</td><td>${statusBadge(t.status)}</td><td>${priBadge(t.priority)}</td><td>${t.weeklyReport?'<span class="badge green">列入</span>':'—'}</td><td><div class="actions-cell"><button class="mini blue" onclick="editTask('${t.id}')">編輯</button><button class="mini" onclick="toggleReport('${t.id}')">${t.weeklyReport?'移出週報':'列入週報'}</button><button class="mini red" onclick="deleteTask('${t.id}')">刪除</button></div></td></tr>`).join("");
+ dataTable.innerHTML=sortTasksAll(tasks).map(t=>`<tr><td><b>${t.title}</b></td><td>${t.category}</td><td>${t.source}</td><td>${statusBadge(t.status)}</td><td>${priBadge(t.priority)}</td><td>${t.weeklyReport?'<span class="badge green">列入</span>':'—'}</td><td><div class="actions-cell"><button class="mini blue" onclick="editTask('${t.id}')">編輯</button><button class="mini" onclick="toggleReport('${t.id}')">${t.weeklyReport?'移出週報':'列入週報'}</button><button class="mini red" onclick="deleteTask('${t.id}')">刪除</button></div></td></tr>`).join("");
 }
 function renderTracking(){
  const arr=tasks.filter(t=>["待追蹤","等待回覆"].includes(t.status)||isOverdue(t)).sort((a,b)=>(a.dueDate||"9999").localeCompare(b.dueDate||"9999"));
- trackingKpis.innerHTML=[["等待回覆",tasks.filter(t=>t.status==="等待回覆").length,"待確認"],["待追蹤",tasks.filter(t=>t.status==="待追蹤").length,"需再次追蹤"],["逾期",tasks.filter(isOverdue).length,"超過期限"],["跨週",arr.filter(t=>!inPeriod(t.createDate)).length,"前週延續"],["本週完成",tasks.filter(t=>inPeriod(t.createDate)&&t.status==="已完成").length,"已結案"]].map(x=>`<div class="kpi"><div class="label">${x[0]}</div><div class="value">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join("");
+ trackingKpis.innerHTML=[["等待回覆",tasks.filter(t=>t.status==="等待回覆").length,"待確認"],["待追蹤",tasks.filter(t=>t.status==="待追蹤").length,"需再次追蹤"],["逾期",tasks.filter(isOverdue).length,"超過期限"],["未完成",tasks.filter(t=>!["已完成","封存"].includes(t.status)).length,"全部未結案"],["已完成",tasks.filter(t=>t.status==="已完成").length,"累計完成"]].map(x=>`<div class="kpi"><div class="label">${x[0]}</div><div class="value">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join("");
  trackingList.innerHTML=arr.length?arr.map(t=>`<div class="item"><div><h4>${t.title}</h4><div class="meta">${statusBadge(t.status)}${priBadge(t.priority)}<span class="badge">${t.source}</span></div></div><div class="date">${dateZH(t.dueDate)}<br><button class="mini blue" onclick="editTask('${t.id}')">編輯</button></div></div>`).join(""):'<div class="empty">目前沒有待追蹤事項</div>';
 }
 function renderMeetings(){
- meetingCards.innerHTML=meetings.length?meetings.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(m=>`<div class="panel"><div class="ph"><div><span class="badge blue">${dateZH(m.date)}</span><h3 style="margin-top:8px">${m.name}</h3><p>${m.room||"未設定地點"}</p></div><span class="badge">${m.status}</span></div><div style="padding:15px 17px;font-size:11px;color:var(--muted)">${m.note||"尚未填寫摘要"}</div><div style="padding:0 17px 16px;display:flex;gap:7px"><button class="mini blue" onclick="editMeeting('${m.id}')">編輯</button><button class="mini" onclick="newTaskFromMeeting('${m.name.replaceAll("'","\\'")}')">建立工作</button><button class="mini red" onclick="deleteMeeting('${m.id}')">刪除</button></div></div>`).join(""):'<div class="empty">尚無會議</div>';
+ const arr=sortMeetingsAll(meetings);
+ meetingCards.innerHTML=arr.length?arr.map(m=>`<div class="panel"><div class="ph"><div><span class="badge blue">${dateZH(m.date)}</span><h3 style="margin-top:8px">${m.name}</h3><p>${m.room||"未設定地點"}</p></div><span class="badge">${m.status}</span></div><div style="padding:15px 17px;font-size:11px;color:var(--muted)">${m.note||"尚未填寫摘要"}</div><div style="padding:0 17px 16px;display:flex;gap:7px"><button class="mini blue" onclick="editMeeting('${m.id}')">編輯</button><button class="mini" onclick="newTaskFromMeeting('${m.name.replaceAll("'","\\'")}')">建立工作</button><button class="mini red" onclick="deleteMeeting('${m.id}')">刪除</button></div></div>`).join(""):'<div class="empty">尚無會議</div>';
 }
 function renderSettings(){
  workCats.innerHTML=categories.work.map(x=>`<span class="chip">${x}<button onclick="deleteCat('WORK','${x.replaceAll("'","\\'")}')">×</button></span>`).join("");
@@ -521,7 +613,7 @@ async function exportWeeklyPdf(){
    if(!r.ok)throw new Error(r.message||"PDF 產生失敗");
    if(popup) popup.location.href=r.downloadUrl||r.url;
    else window.open(r.downloadUrl||r.url,"_blank");
-   toast("完整期間報告 PDF 已建立並存入 Google Drive／週報PDF");
+   toast("主任週報 PDF 已建立並存入 Google Drive／週報PDF");
    await delayAndReload();
  }catch(e){
    if(popup)popup.close();
@@ -530,13 +622,59 @@ async function exportWeeklyPdf(){
 }
 
 function renderProjects(){
- const arr=projects.filter(p=>{
-   const s=p.startDate||"0000-01-01",e=p.endDate||"9999-12-31";
-   return s<=fmtDate(periodEnd)&&e>=fmtDate(periodStart);
- });
- const done=arr.filter(p=>p.status==="已完成").length,active=arr.filter(p=>["規劃中","進行中"].includes(p.status)).length,follow=arr.filter(p=>p.status==="待追蹤").length;
- projectKpis.innerHTML=[["期間專案",arr.length,"與所選期間重疊"],["進行中",active,"規劃 / 執行"],["待追蹤",follow,"需持續追蹤"],["已完成",done,"完成專案"],["完成率",arr.length?Math.round(done/arr.length*100)+"%":"0%","依期間專案"]].map(x=>`<div class="kpi"><div class="label">${x[0]}</div><div class="value">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join("");
- projectTable.innerHTML=arr.length?arr.map(p=>`<tr><td><b>${escapeHtml(p.name)}</b><br><span style="color:#8a95a7;font-size:10px">${escapeHtml(p.note||"")}</span></td><td>${escapeHtml(p.category||"")}</td><td>${dateZH(p.startDate)} ～ ${dateZH(p.endDate)}</td><td>${statusBadge(p.status)}</td><td>${escapeHtml(p.progress||"—")}</td><td>${escapeHtml(p.nextAction||"—")}</td><td><div class="actions-cell"><button class="mini blue" onclick="editProject('${p.id}')">編輯</button><button class="mini red" onclick="deleteProject('${p.id}')">刪除</button></div></td></tr>`).join(""):'<tr><td colspan="7">此期間沒有專案資料</td></tr>';
+ const arr=sortProjectsAll(projects);
+ const done=arr.filter(p=>p.status==="已完成").length;
+ const active=arr.filter(p=>p.status==="進行中").length;
+ const planning=arr.filter(p=>p.status==="規劃中").length;
+ const follow=arr.filter(p=>p.status==="待追蹤").length;
+ const soon=arr.filter(p=>p.status!=="已完成"&&p.endDate&&daysBetween(today,new Date(p.endDate+"T00:00:00"))>=0&&daysBetween(today,new Date(p.endDate+"T00:00:00"))<=30).length;
+
+ projectKpis.innerHTML=[
+   ["全部專案",arr.length,"累計專案"],
+   ["進行中",active,"目前執行"],
+   ["待追蹤",follow,"需持續掌握"],
+   ["已完成",done,arr.length?`完成率 ${Math.round(done/arr.length*100)}%`:"完成率 0%"],
+   ["30日內到期",soon,"近期里程碑"]
+ ].map(x=>`<div class="kpi"><div class="label">${x[0]}</div><div class="value">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join("");
+
+ renderDonut("projectStatusDonut",arr,"status");
+
+ const cc={};arr.forEach(p=>{const k=p.category||"未分類";cc[k]=(cc[k]||0)+1});
+ const ce=Object.entries(cc).sort((a,b)=>b[1]-a[1]),cmax=Math.max(1,...ce.map(x=>x[1]));
+ projectCategoryBars.innerHTML=ce.length?ce.map(e=>`<div class="srow"><span>${escapeHtml(e[0])}</span><div class="track"><div class="fill" style="width:${e[1]/cmax*100}%"></div></div><b>${e[1]}</b></div>`).join(""):'<div class="empty">尚無專案資料</div>';
+
+ const timeline=arr.filter(p=>p.startDate||p.endDate).slice(0,8);
+ projectTimeline.innerHTML=timeline.length?timeline.map(p=>{
+   const pct=projectElapsedPercent(p);
+   const cls=p.status==="已完成"?"done":(p.endDate&&new Date(p.endDate+"T23:59:59")<today?"warn":"");
+   return `<div class="project-time-row">
+     <div class="project-time-name" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</div>
+     <div class="project-time-track"><div class="project-time-fill ${cls}" style="width:${pct}%"></div></div>
+     <div class="project-time-date">${pct}%<br>${dateZH(p.endDate)}</div>
+   </div>`;
+ }).join(""):'<div class="empty">尚無專案時程資料</div>';
+
+ const milestones=arr.filter(p=>p.status!=="已完成"&&p.endDate).sort((a,b)=>a.endDate.localeCompare(b.endDate)).slice(0,6);
+ projectMilestones.innerHTML=milestones.length?milestones.map(p=>{
+   const days=daysBetween(today,new Date(p.endDate+"T00:00:00"));
+   const tag=days<0?'<span class="badge red">已逾期</span>':days<=30?`<span class="badge orange">${days} 天</span>`:`<span class="badge">${days} 天</span>`;
+   return `<div class="item"><div><h4>${escapeHtml(p.name)}</h4><div class="meta">${statusBadge(p.status)}<span class="badge">${escapeHtml(p.category||"未分類")}</span>${tag}</div></div><div class="date">${dateZH(p.endDate)}</div></div>`;
+ }).join(""):'<div class="empty">沒有待完成的專案里程碑</div>';
+
+ projectTable.innerHTML=arr.length?arr.map(p=>`<tr><td><b>${escapeHtml(p.name)}</b><br><span style="color:#8a95a7;font-size:10px">${escapeHtml(p.note||"")}</span></td><td>${escapeHtml(p.category||"")}</td><td>${dateZH(p.startDate)} ～ ${dateZH(p.endDate)}</td><td>${statusBadge(p.status)}</td><td>${escapeHtml(p.progress||"—")}</td><td>${escapeHtml(p.nextAction||"—")}</td><td><div class="actions-cell"><button class="mini blue" onclick="editProject('${p.id}')">編輯</button><button class="mini red" onclick="deleteProject('${p.id}')">刪除</button></div></td></tr>`).join(""):'<tr><td colspan="7">目前沒有專案資料</td></tr>';
+}
+function daysBetween(a,b){
+ const x=new Date(a.getFullYear(),a.getMonth(),a.getDate()),y=new Date(b.getFullYear(),b.getMonth(),b.getDate());
+ return Math.ceil((y-x)/86400000);
+}
+function projectElapsedPercent(p){
+ if(p.status==="已完成")return 100;
+ if(!p.startDate||!p.endDate)return 0;
+ const s=new Date(p.startDate+"T00:00:00"),e=new Date(p.endDate+"T00:00:00");
+ if(e<=s)return today>=e?100:0;
+ if(today<=s)return 0;
+ if(today>=e)return 100;
+ return Math.max(0,Math.min(100,Math.round((today-s)/(e-s)*100)));
 }
 function openProject(id=null){
  editProjectId=id;const p=id?projects.find(x=>x.id===id):null;
@@ -556,10 +694,10 @@ function renderCourses(){
  renderCourseType("聽課",learnKpis,learnTable);
 }
 function renderCourseType(type,kpiEl,tableEl){
- const arr=courses.filter(c=>c.type===type&&periodDate(c.date));
+ const arr=sortCoursesAll(courses.filter(c=>c.type===type));
  const done=arr.filter(c=>c.status==="已完成").length;
  const hrs=arr.reduce((s,c)=>s+Number(c.hours||0),0);
- kpiEl.innerHTML=[["期間筆數",arr.length,type+"紀錄"],["已完成",done,"完成課程"],["總時數",hrs,"小時"],["預定",arr.filter(c=>c.status==="預定").length,"尚未完成"],["取消",arr.filter(c=>c.status==="取消").length,"取消紀錄"]].map(x=>`<div class="kpi"><div class="label">${x[0]}</div><div class="value">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join("");
+ kpiEl.innerHTML=[["全部紀錄",arr.length,type+"紀錄"],["已完成",done,"完成課程"],["總時數",hrs,"小時"],["預定",arr.filter(c=>c.status==="預定").length,"尚未完成"],["取消",arr.filter(c=>c.status==="取消").length,"取消紀錄"]].map(x=>`<div class="kpi"><div class="label">${x[0]}</div><div class="value">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join("");
  tableEl.innerHTML=arr.length?arr.map(c=>`<tr><td><b>${escapeHtml(c.title)}</b><br><span style="color:#8a95a7;font-size:10px">${escapeHtml(c.note||"")}</span></td><td>${dateZH(c.date)}</td><td>${c.hours||0} 小時</td><td>${escapeHtml(c.organizer||"")}</td><td>${escapeHtml(c.location||"")}</td><td>${statusBadge(c.status)}</td><td><div class="actions-cell"><button class="mini blue" onclick="editCourse('${c.id}')">編輯</button><button class="mini red" onclick="deleteCourse('${c.id}')">刪除</button></div></td></tr>`).join(""):'<tr><td colspan="7">此期間沒有'+type+'資料</td></tr>';
 }
 function openCourse(type="授課",id=null){
