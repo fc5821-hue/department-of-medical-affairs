@@ -42,6 +42,10 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 .modal-bg{position:fixed;inset:0;background:rgba(15,25,45,.38);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}.modal-bg.show{display:flex}.modal{width:min(760px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:22px}.mh{padding:19px 21px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.mh h3{margin:0}.close{border:0;background:#f3f5f8;border-radius:10px;width:34px;height:34px}.mb{padding:19px 21px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field.full{grid-column:1/-1}.field label{display:block;font-size:11px;font-weight:900;color:#68748a;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:11px;padding:10px 11px;outline:0;background:#fff}.field textarea{resize:vertical}.checkrow{display:flex;align-items:center;gap:8px;font-size:12px;color:#536077}.checkrow input{width:auto}.mf{padding:15px 21px 19px;display:flex;justify-content:flex-end;gap:8px}
 .toast{position:fixed;right:22px;bottom:22px;background:#182238;color:#fff;padding:11px 15px;border-radius:11px;opacity:0;transform:translateY(8px);transition:.25s;z-index:80;font-size:12px}.toast.show{opacity:1;transform:translateY(0)}
 .empty{padding:30px;text-align:center;color:var(--muted);font-size:12px}.mobile{display:none}
+.weekly-input{width:100%;min-width:170px;min-height:58px;border:1px solid var(--line);border-radius:9px;padding:8px 9px;resize:vertical;background:#fff;line-height:1.5}
+.weekly-input:focus{outline:2px solid #dfe8ff;border-color:#8ba7f7}
+.weekly-actions{display:flex;gap:6px;flex-wrap:wrap}
+.pdf-btn{background:#172236!important;color:#fff!important}
 .loading{position:fixed;inset:0;background:rgba(255,255,255,.74);display:none;align-items:center;justify-content:center;z-index:100;font-weight:900;color:var(--blue)}.loading.show{display:flex}
 @media(max-width:1100px){.cards{grid-template-columns:repeat(3,1fr)}.grid3{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
 @media(max-width:780px){.app{grid-template-columns:1fr}.side{position:fixed;left:-250px;width:236px;transition:.25s}.side.show{left:0}.main{padding:17px 14px 38px}.mobile{display:inline-block}.top{flex-wrap:wrap}.actions{width:100%}.search{min-width:0;flex:1}.cards{grid-template-columns:1fr 1fr}.grid3,.settings-grid{grid-template-columns:1fr}.hero-row{align-items:flex-start;flex-direction:column}.donut-wrap{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}}
@@ -93,7 +97,11 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
   </section>
 
   <section id="weekly" class="view">
-    <div class="section-title"><div><h2>主任週報</h2><p>由工作資料自動整理，可人工修正摘要。</p></div><button class="btn light" onclick="window.print()">列印週報</button></div>
+    <div class="section-title"><div><h2>主任週報</h2><p>由工作資料自動整理；本週進度與下週動作可直接在此填寫。</p></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn light" onclick="saveAllWeeklyRows()">儲存全部進度</button>
+      <button class="btn pdf-btn" onclick="exportWeeklyPdf()">匯出完整 PDF</button>
+    </div></div>
     <div class="cards" id="weeklyKpis"></div>
     <div class="grid2">
       <div class="panel"><div class="ph"><div><h3>主任摘要</h3><p>儲存後寫入 Google Sheets</p></div></div><div class="mb"><textarea id="weeklySummary" style="width:100%;min-height:110px;border:1px solid var(--line);border-radius:11px;padding:11px"></textarea><div style="text-align:right;margin-top:8px"><button class="btn primary" onclick="saveWeeklySummary()">儲存摘要</button></div></div></div>
@@ -143,8 +151,8 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 <div class="field"><label>建立日期</label><input type="date" id="fCreate"></div>
 <div class="field"><label>到期 / 追蹤日期</label><input type="date" id="fDue"></div>
 <div class="field full"><label>工作內容 / 備註</label><textarea rows="3" id="fNote"></textarea></div>
-<div class="field full"><label>本週進度</label><textarea rows="2" id="fProgress"></textarea></div>
-<div class="field full"><label>下週動作</label><textarea rows="2" id="fNext"></textarea></div>
+<div class="field full"><label>本週進度（主任週報會直接顯示）</label><textarea rows="2" id="fProgress" placeholder="例如：已完成資料彙整並送主管確認"></textarea></div>
+<div class="field full"><label>下週動作（主任週報會直接顯示）</label><textarea rows="2" id="fNext" placeholder="例如：持續追蹤回覆結果；若完成可填「已完成，無後續」"></textarea></div>
 <div class="field full"><label>附件連結（Google Drive，可留空）</label><input id="fAttachment" placeholder="https://drive.google.com/..."></div>
 <div class="field full"><label class="checkrow"><input type="checkbox" id="fReport"> 列入主任週報</label></div>
 </div></div><div class="mf"><button class="btn light" onclick="closeTask()">取消</button><button class="btn primary" onclick="saveTask()">儲存</button></div></div></div>
@@ -191,12 +199,15 @@ function inWeek(s){const d=new Date(s+"T00:00:00");return d>=sow(today)&&d<=eow(
 function isOverdue(t){return !["已完成","封存"].includes(t.status)&&t.dueDate&&new Date(t.dueDate+"T23:59:59")<today}
 function statusBadge(s){let c=s==="已完成"?"green":s==="待追蹤"?"purple":s==="等待回覆"?"orange":s==="待處理"?"blue":"";return `<span class="badge ${c}">${s}</span>`}
 function priBadge(p){let c=p==="緊急"?"red":p==="重要"?"orange":"";return `<span class="badge ${c}">${p||"一般"}</span>`}
+function escapeHtml(value){
+ return String(value??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
 
 async function loadAll(){
  if(!SCRIPT_URL.startsWith("https://script.google.com/")){toast("請先設定 SCRIPT_URL");return}
  loading(true);
  try{
-   const r=await apiGet("bootstrap");
+   const r=await apiGet("bootstrap",{weekId:getWeekId()});
    if(!r.ok) throw new Error(r.message||"載入失敗");
    tasks=r.tasks||[];meetings=r.meetings||[];categories=r.categories||{work:[],source:[]};weeklySummary=r.weeklySummary||"";
    render();
@@ -244,7 +255,14 @@ function renderWeekly(){
  document.getElementById("weeklyKpis").innerHTML=[["列入週報",rpt.length,"週報重點"],["已完成",done,`完成率 ${rate}%`],["待追蹤",follow,"持續追蹤"],["逾期",od,"需掌握"],["會議相關",rpt.filter(t=>t.source!=="其他").length,"會議 / 交辦"]].map(x=>`<div class="kpi"><div class="label">${x[0]}</div><div class="value">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join("");
  document.getElementById("weeklySummary").value=weeklySummary||`本週共列入週報 ${rpt.length} 項工作，已完成 ${done} 項，完成率 ${rate}%。目前尚有 ${follow} 項待追蹤，${od} 項逾期。`;
  renderDonut("weeklyDonut",rpt,"category");
- document.getElementById("weeklyTable").innerHTML=rpt.length?rpt.map(t=>`<tr><td><b>${t.title}</b></td><td>${t.source}</td><td>${t.weekProgress||"—"}</td><td>${statusBadge(t.status)}</td><td>${t.nextAction||"—"}</td><td><button class="mini blue" onclick="editTask('${t.id}')">編輯</button></td></tr>`).join(""):'<tr><td colspan="6">目前沒有週報資料</td></tr>';
+ document.getElementById("weeklyTable").innerHTML=rpt.length?rpt.map(t=>`<tr>
+ <td><b>${t.title}</b><div style="margin-top:5px">${priBadge(t.priority)}</div></td>
+ <td>${t.source}</td>
+ <td><textarea class="weekly-input" id="wp-${t.id}" placeholder="填寫本週已完成或目前辦理進度">${escapeHtml(t.weekProgress||"")}</textarea></td>
+ <td>${statusBadge(t.status)}</td>
+ <td><textarea class="weekly-input" id="na-${t.id}" placeholder="${t.status==="已完成"?"例如：已完成，無後續":"填寫下週預計辦理或追蹤事項"}">${escapeHtml(t.nextAction||"")}</textarea></td>
+ <td><div class="weekly-actions"><button class="mini blue" onclick="saveWeeklyRow('${t.id}')">儲存本列</button><button class="mini" onclick="editTask('${t.id}')">完整編輯</button></div></td>
+ </tr>`).join(""):'<tr><td colspan="6">目前沒有週報資料</td></tr>';
 }
 function renderTasks(){
  const q=(taskSearch.value||"").toLowerCase(),st=statusFilter.value,so=sourceFilter.value,ca=categoryFilter.value;
@@ -301,6 +319,53 @@ async function addCat(type){
  const inp=type==="WORK"?newWorkCat:newSourceCat,v=inp.value.trim();if(!v)return;await apiPost({action:"addCategory",type,name:v});inp.value="";await delayAndReload();toast("分類已新增")
 }
 async function deleteCat(type,name){if(confirm(`確定刪除「${name}」？`)){await apiPost({action:"deleteCategory",type,name});await delayAndReload()}}
+
+async function saveWeeklyRow(id, silent=false){
+ const t=tasks.find(x=>x.id===id);if(!t)return;
+ const wp=document.getElementById("wp-"+id),na=document.getElementById("na-"+id);
+ const weekProgress=wp?wp.value.trim():t.weekProgress;
+ const nextAction=na?na.value.trim():t.nextAction;
+ await apiPost({action:"updateTask",...t,weekProgress,nextAction});
+ t.weekProgress=weekProgress;t.nextAction=nextAction;
+ if(!silent)toast("本週進度與下週動作已儲存");
+}
+async function saveAllWeeklyRows(silent=false){
+ const rpt=tasks.filter(t=>t.weeklyReport&&!["封存"].includes(t.status));
+ loading(true);
+ try{
+   for(const t of rpt){
+     const wp=document.getElementById("wp-"+t.id),na=document.getElementById("na-"+t.id);
+     if(!wp||!na)continue;
+     const wv=wp.value.trim(),nv=na.value.trim();
+     if(wv!==String(t.weekProgress||"")||nv!==String(t.nextAction||"")){
+       await apiPost({action:"updateTask",...t,weekProgress:wv,nextAction:nv});
+       t.weekProgress=wv;t.nextAction=nv;
+       await delay(120);
+     }
+   }
+   if(!silent)toast("週報進度已全部儲存");
+ }finally{loading(false)}
+}
+async function exportWeeklyPdf(){
+ if(!SCRIPT_URL.startsWith("https://script.google.com/")){toast("請先設定 SCRIPT_URL");return}
+ const popup=window.open("about:blank","_blank");
+ if(popup){popup.document.write("<p style='font-family:sans-serif;padding:24px'>正在產生完整週報 PDF，請稍候…</p>")}
+ loading(true);
+ try{
+   await saveAllWeeklyRows(true);
+   await apiPost({action:"saveWeeklySummary",weekId:getWeekId(),summary:weeklySummary.value});
+   await delay(700);
+   const r=await apiGet("exportWeeklyPdf",{weekId:getWeekId()});
+   if(!r.ok)throw new Error(r.message||"PDF 產生失敗");
+   if(popup) popup.location.href=r.downloadUrl||r.url;
+   else window.open(r.downloadUrl||r.url,"_blank");
+   toast("完整週報 PDF 已建立並存入 Google Drive／週報PDF");
+   await delayAndReload();
+ }catch(e){
+   if(popup)popup.close();
+   toast("PDF 匯出失敗："+e.message);
+ }finally{loading(false)}
+}
 async function saveWeeklySummary(){await apiPost({action:"saveWeeklySummary",weekId:getWeekId(),summary:weeklySummary.value});await delayAndReload();toast("主任摘要已儲存")}
 function getWeekId(){const d=sow(today);return `${d.getFullYear()}-W${String(Math.ceil((((d-new Date(d.getFullYear(),0,1))/86400000)+new Date(d.getFullYear(),0,1).getDay()+1)/7)).padStart(2,"0")}`}
 function delay(ms){return new Promise(r=>setTimeout(r,ms))}
