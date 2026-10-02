@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f7f9fc">
+<title>醫療事務室｜工作暨週報管理平台</title>
+<style>
+:root{
+  --bg:#f5f7fb;--panel:#fff;--line:#e7ecf2;--text:#172236;--muted:#778399;
+  --blue:#2f63e9;--blue2:#7b99f2;--blueSoft:#edf3ff;
+  --green:#219a6a;--greenSoft:#eaf8f2;--orange:#d77a1e;--orangeSoft:#fff3e6;
+  --red:#d14857;--redSoft:#fff0f2;--purple:#7862dc;--purpleSoft:#f2efff;
+  --shadow:0 18px 48px rgba(24,40,70,.06)
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif;color:var(--text);background:linear-gradient(180deg,#fbfcff,#f5f7fb 45%)}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.app{display:grid;grid-template-columns:236px 1fr;min-height:100vh}
+.side{position:sticky;top:0;height:100vh;background:#fff;border-right:1px solid var(--line);padding:22px 16px;z-index:20}
+.brand{display:flex;align-items:center;gap:11px;padding:2px 6px 24px}.logo{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#2f63e9,#7895f1);color:#fff;font-weight:900}.brand b{font-size:14px;display:block}.brand small{font-size:11px;color:var(--muted)}
+.nav{display:flex;flex-direction:column;gap:5px}.nav button{border:0;background:transparent;color:#5d687b;text-align:left;padding:12px 13px;border-radius:12px;font-weight:800}.nav button:hover{background:#f5f7fb}.nav button.active{background:var(--blueSoft);color:var(--blue)}
+.sync{position:absolute;bottom:18px;left:16px;right:16px;padding:13px;border:1px solid var(--line);border-radius:15px;background:#f8fafc;font-size:11px;color:var(--muted)}.sync b{display:block;color:var(--green);font-size:12px;margin-bottom:4px}
+.main{padding:24px 30px 60px;min-width:0}.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:20px}.head h1{margin:0;font-size:24px}.head p{margin:5px 0 0;color:var(--muted);font-size:13px}
+.actions{display:flex;gap:9px;align-items:center}.search{background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:13px;padding:10px 13px;min-width:300px}.search input{border:0;outline:0;width:100%;background:transparent}
+.btn{border:0;border-radius:12px;padding:10px 14px;font-weight:800}.btn.primary{background:var(--blue);color:#fff}.btn.light{background:#fff;border:1px solid var(--line);color:#33415b}.btn.danger{background:var(--redSoft);color:var(--red)}
+.view{display:none}.view.active{display:block}
+.hero{background:linear-gradient(125deg,#fff 0%,#f9fbff 65%,#edf3ff 100%);border:1px solid var(--line);border-radius:24px;padding:21px 23px;box-shadow:var(--shadow);margin-bottom:15px}.hero-row{display:flex;justify-content:space-between;gap:15px;align-items:center}.hero h2{margin:0 0 6px;font-size:20px}.hero p{margin:0;color:var(--muted);font-size:13px;line-height:1.7}.week{font-size:11px;color:var(--blue);font-weight:900;background:var(--blueSoft);padding:8px 11px;border-radius:999px}
+.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:15px}.kpi{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px 17px;box-shadow:var(--shadow)}.kpi .label{font-size:12px;color:var(--muted);font-weight:800;display:flex;justify-content:space-between}.kpi .value{font-size:28px;font-weight:900;margin:9px 0 5px}.kpi .sub{font-size:11px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-bottom:14px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);overflow:hidden}.ph{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:17px 18px 12px;border-bottom:1px solid var(--line)}.ph h3{margin:0;font-size:15px}.ph p{margin:4px 0 0;color:var(--muted);font-size:11px}
+.badge{font-size:10px;font-weight:900;padding:5px 8px;border-radius:999px;background:#f2f5f9;color:#667287;display:inline-block}.badge.blue{background:var(--blueSoft);color:var(--blue)}.badge.green{background:var(--greenSoft);color:var(--green)}.badge.orange{background:var(--orangeSoft);color:var(--orange)}.badge.red{background:var(--redSoft);color:var(--red)}.badge.purple{background:var(--purpleSoft);color:var(--purple)}
+.chartbox{padding:16px 18px 18px}.bar-chart{display:flex;align-items:flex-end;height:180px;gap:10px;padding:10px 2px 0}.bar-col{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:7px}.bar-wrap{height:135px;width:100%;display:flex;align-items:flex-end;justify-content:center}.bar{width:min(32px,70%);background:linear-gradient(180deg,#7899f4,#2f63e9);border-radius:9px 9px 4px 4px;position:relative;min-height:8px}.bar .n{position:absolute;top:-21px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:900}.bar-col small{font-size:10px;color:var(--muted)}
+.donut-wrap{display:grid;grid-template-columns:150px 1fr;align-items:center;gap:8px}.donut{width:135px;height:135px;border-radius:50%;position:relative;margin:auto}.donut:after{content:"";position:absolute;inset:25px;background:#fff;border-radius:50%}.donut-center{position:absolute;inset:0;display:grid;place-items:center;z-index:2;text-align:center}.donut-center b{font-size:24px}.donut-center span{display:block;font-size:10px;color:var(--muted)}.legend{display:flex;flex-direction:column;gap:9px}.legend-row{display:grid;grid-template-columns:10px 1fr auto;gap:8px;align-items:center;font-size:11px}.dot{width:9px;height:9px;border-radius:50%}
+.source-bars{padding:16px 18px}.srow{display:grid;grid-template-columns:112px 1fr 34px;gap:10px;align-items:center;margin:12px 0;font-size:11px}.track{height:8px;background:#eef2f6;border-radius:999px;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,#2f63e9,#7f9df2);border-radius:999px}
+.list{padding:4px 16px 12px}.item{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px 2px;border-bottom:1px solid #eef2f6}.item:last-child{border-bottom:0}.item h4{margin:0 0 5px;font-size:13px}.meta{display:flex;gap:6px;flex-wrap:wrap}.date{font-size:11px;color:var(--muted)}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:12px}.toolbar input,.toolbar select{border:1px solid var(--line);background:#fff;border-radius:11px;padding:10px 11px;outline:0}
+.table-wrap{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}table{width:100%;border-collapse:collapse;min-width:900px}th,td{padding:12px 13px;border-bottom:1px solid #edf1f5;text-align:left;font-size:12px;vertical-align:top}th{background:#f8fafc;color:#6a768b;font-size:11px}tr:hover td{background:#fcfdff}
+.actions-cell{display:flex;gap:6px;flex-wrap:wrap}.mini{border:1px solid var(--line);background:#fff;border-radius:9px;padding:6px 8px;font-size:10px;font-weight:800}.mini.blue{color:var(--blue)}.mini.red{color:var(--red)}
+.section-title{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:4px 0 12px}.section-title h2{margin:0;font-size:20px}.section-title p{margin:5px 0 0;color:var(--muted);font-size:12px}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.settings-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:17px;box-shadow:var(--shadow)}.settings-card h3{margin:0 0 12px;font-size:15px}.chips{display:flex;gap:7px;flex-wrap:wrap}.chip{background:#f5f7fb;border:1px solid var(--line);border-radius:10px;padding:7px 9px;font-size:11px}.chip button{border:0;background:transparent;color:var(--red);padding-left:6px}.add-inline{display:flex;gap:8px;margin-top:12px}.add-inline input{flex:1;border:1px solid var(--line);border-radius:11px;padding:10px}
+.modal-bg{position:fixed;inset:0;background:rgba(15,25,45,.38);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}.modal-bg.show{display:flex}.modal{width:min(760px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:22px}.mh{padding:19px 21px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.mh h3{margin:0}.close{border:0;background:#f3f5f8;border-radius:10px;width:34px;height:34px}.mb{padding:19px 21px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field.full{grid-column:1/-1}.field label{display:block;font-size:11px;font-weight:900;color:#68748a;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:11px;padding:10px 11px;outline:0;background:#fff}.field textarea{resize:vertical}.checkrow{display:flex;align-items:center;gap:8px;font-size:12px;color:#536077}.checkrow input{width:auto}.mf{padding:15px 21px 19px;display:flex;justify-content:flex-end;gap:8px}
+.toast{position:fixed;right:22px;bottom:22px;background:#182238;color:#fff;padding:11px 15px;border-radius:11px;opacity:0;transform:translateY(8px);transition:.25s;z-index:80;font-size:12px}.toast.show{opacity:1;transform:translateY(0)}
+.empty{padding:30px;text-align:center;color:var(--muted);font-size:12px}.mobile{display:none}
+.loading{position:fixed;inset:0;background:rgba(255,255,255,.74);display:none;align-items:center;justify-content:center;z-index:100;font-weight:900;color:var(--blue)}.loading.show{display:flex}
+@media(max-width:1100px){.cards{grid-template-columns:repeat(3,1fr)}.grid3{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
+@media(max-width:780px){.app{grid-template-columns:1fr}.side{position:fixed;left:-250px;width:236px;transition:.25s}.side.show{left:0}.main{padding:17px 14px 38px}.mobile{display:inline-block}.top{flex-wrap:wrap}.actions{width:100%}.search{min-width:0;flex:1}.cards{grid-template-columns:1fr 1fr}.grid3,.settings-grid{grid-template-columns:1fr}.hero-row{align-items:flex-start;flex-direction:column}.donut-wrap{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}}
+@media(max-width:480px){.cards{grid-template-columns:1fr}.actions .btn.light{display:none}}
+</style>
+</head>
+<body>
+<div class="loading" id="loading">正在同步 Google Sheets…</div>
+<div class="app">
+<aside class="side" id="side">
+  <div class="brand"><div class="logo">MA</div><div><b>醫療事務室工作平台</b><small>Work & Weekly Report</small></div></div>
+  <div class="nav">
+    <button class="active" data-v="dashboard">⌂　工作總覽</button>
+    <button data-v="weekly">▥　主任週報</button>
+    <button data-v="tasks">✓　工作事項</button>
+    <button data-v="tracking">◉　待追蹤</button>
+    <button data-v="meetings">▣　會議管理</button>
+    <button data-v="data">☷　資料管理</button>
+    <button data-v="settings">⚙　分類設定</button>
+  </div>
+  <div class="sync"><b id="syncState">● 尚未同步</b><span id="syncTime">等待資料</span></div>
+</aside>
+<main class="main">
+  <div class="top">
+    <div class="head">
+      <button class="btn light mobile" onclick="side.classList.toggle('show')">☰</button>
+      <h1>醫療事務室｜工作暨週報管理平台</h1>
+      <p id="weekText"></p>
+    </div>
+    <div class="actions">
+      <div class="search"><input id="globalSearch" placeholder="搜尋工作、會議、關鍵字…"></div>
+      <button class="btn light" onclick="loadAll()">同步</button>
+      <button class="btn primary" onclick="openTask()">＋ 新增工作</button>
+    </div>
+  </div>
+
+  <section id="dashboard" class="view active">
+    <div class="hero"><div class="hero-row"><div><h2>本週工作概況</h2><p id="heroSummary"></p></div><div class="week" id="weekNo"></div></div></div>
+    <div class="cards" id="kpiCards"></div>
+    <div class="grid2">
+      <div class="panel"><div class="ph"><div><h3>本週每日工作量</h3><p>依建立日期統計</p></div><span class="badge blue" id="weekCountBadge"></span></div><div class="chartbox"><div class="bar-chart" id="weekBar"></div></div></div>
+      <div class="panel"><div class="ph"><div><h3>本週工作結構</h3><p>依工作分類分布</p></div></div><div class="chartbox" id="donutBox"></div></div>
+    </div>
+    <div class="grid3">
+      <div class="panel"><div class="ph"><div><h3>工作來源分析</h3><p>會議與交辦來源</p></div></div><div class="source-bars" id="sourceBars"></div></div>
+      <div class="panel"><div class="ph"><div><h3>重要追蹤事項</h3><p>尚未結案且需關注</p></div></div><div class="list" id="importantList"></div></div>
+      <div class="panel"><div class="ph"><div><h3>近期會議</h3><p>與工作事項連動</p></div></div><div class="list" id="meetingListMini"></div></div>
+    </div>
+  </section>
+
+  <section id="weekly" class="view">
+    <div class="section-title"><div><h2>主任週報</h2><p>由工作資料自動整理，可人工修正摘要。</p></div><button class="btn light" onclick="window.print()">列印週報</button></div>
+    <div class="cards" id="weeklyKpis"></div>
+    <div class="grid2">
+      <div class="panel"><div class="ph"><div><h3>主任摘要</h3><p>儲存後寫入 Google Sheets</p></div></div><div class="mb"><textarea id="weeklySummary" style="width:100%;min-height:110px;border:1px solid var(--line);border-radius:11px;padding:11px"></textarea><div style="text-align:right;margin-top:8px"><button class="btn primary" onclick="saveWeeklySummary()">儲存摘要</button></div></div></div>
+      <div class="panel"><div class="ph"><div><h3>週報工作結構</h3><p>僅統計列入週報項目</p></div></div><div class="chartbox" id="weeklyDonut"></div></div>
+    </div>
+    <div class="panel"><div class="ph"><div><h3>本週重點工作與下週動作</h3></div></div><div class="table-wrap" style="border:0;box-shadow:none;border-radius:0"><table><thead><tr><th>工作事項</th><th>來源</th><th>本週進度</th><th>狀態</th><th>下週動作</th><th>操作</th></tr></thead><tbody id="weeklyTable"></tbody></table></div></div>
+  </section>
+
+  <section id="tasks" class="view">
+    <div class="section-title"><div><h2>工作事項</h2><p>新增、更新、完成與追蹤。</p></div><button class="btn primary" onclick="openTask()">＋ 新增工作</button></div>
+    <div class="toolbar"><input id="taskSearch" placeholder="搜尋工作…"><select id="statusFilter"><option value="">全部狀態</option><option>待處理</option><option>處理中</option><option>等待回覆</option><option>待追蹤</option><option>已完成</option><option>封存</option></select><select id="sourceFilter"><option value="">全部來源</option></select><select id="categoryFilter"><option value="">全部分類</option></select></div>
+    <div class="table-wrap"><table><thead><tr><th>工作事項</th><th>分類</th><th>來源</th><th>狀態</th><th>到期 / 追蹤</th><th>週報</th><th>操作</th></tr></thead><tbody id="taskTable"></tbody></table></div>
+  </section>
+
+  <section id="tracking" class="view">
+    <div class="section-title"><div><h2>待追蹤中心</h2><p>等待回覆、逾期與跨週事項。</p></div></div>
+    <div class="cards" id="trackingKpis"></div>
+    <div class="panel"><div class="ph"><div><h3>追蹤清單</h3></div></div><div class="list" id="trackingList"></div></div>
+  </section>
+
+  <section id="meetings" class="view">
+    <div class="section-title"><div><h2>會議管理</h2><p>建立會議，並快速產生衍生工作。</p></div><button class="btn primary" onclick="openMeeting()">＋ 新增會議</button></div>
+    <div class="grid3" id="meetingCards"></div>
+  </section>
+
+  <section id="data" class="view">
+    <div class="section-title"><div><h2>資料管理</h2><p>完整後台操作。</p></div></div>
+    <div class="table-wrap"><table><thead><tr><th>工作事項</th><th>分類</th><th>來源</th><th>狀態</th><th>優先度</th><th>週報</th><th>操作</th></tr></thead><tbody id="dataTable"></tbody></table></div>
+  </section>
+
+  <section id="settings" class="view">
+    <div class="section-title"><div><h2>分類設定</h2><p>新增或刪除工作分類與來源。</p></div></div>
+    <div class="settings-grid">
+      <div class="settings-card"><h3>工作分類</h3><div class="chips" id="workCats"></div><div class="add-inline"><input id="newWorkCat" placeholder="新增工作分類"><button class="btn primary" onclick="addCat('WORK')">新增</button></div></div>
+      <div class="settings-card"><h3>工作來源 / 會議類型</h3><div class="chips" id="sourceCats"></div><div class="add-inline"><input id="newSourceCat" placeholder="新增來源"><button class="btn primary" onclick="addCat('SOURCE')">新增</button></div></div>
+    </div>
+  </section>
+</main>
+</div>
+
+<div class="modal-bg" id="taskModal"><div class="modal"><div class="mh"><h3 id="taskModalTitle">新增工作</h3><button class="close" onclick="closeTask()">✕</button></div><div class="mb"><div class="form-grid">
+<div class="field full"><label>工作事項</label><input id="fTitle"></div>
+<div class="field"><label>工作分類</label><select id="fCat"></select></div>
+<div class="field"><label>來源 / 關聯會議</label><select id="fSource"></select></div>
+<div class="field"><label>狀態</label><select id="fStatus"><option>待處理</option><option>處理中</option><option>等待回覆</option><option>待追蹤</option><option>已完成</option><option>封存</option></select></div>
+<div class="field"><label>優先度</label><select id="fPriority"><option>一般</option><option>重要</option><option>緊急</option></select></div>
+<div class="field"><label>建立日期</label><input type="date" id="fCreate"></div>
+<div class="field"><label>到期 / 追蹤日期</label><input type="date" id="fDue"></div>
+<div class="field full"><label>工作內容 / 備註</label><textarea rows="3" id="fNote"></textarea></div>
+<div class="field full"><label>本週進度</label><textarea rows="2" id="fProgress"></textarea></div>
+<div class="field full"><label>下週動作</label><textarea rows="2" id="fNext"></textarea></div>
+<div class="field full"><label>附件連結（Google Drive，可留空）</label><input id="fAttachment" placeholder="https://drive.google.com/..."></div>
+<div class="field full"><label class="checkrow"><input type="checkbox" id="fReport"> 列入主任週報</label></div>
+</div></div><div class="mf"><button class="btn light" onclick="closeTask()">取消</button><button class="btn primary" onclick="saveTask()">儲存</button></div></div></div>
+
+<div class="modal-bg" id="meetingModal"><div class="modal"><div class="mh"><h3 id="meetingModalTitle">新增會議</h3><button class="close" onclick="closeMeeting()">✕</button></div><div class="mb"><div class="form-grid">
+<div class="field"><label>會議名稱</label><input id="mName"></div>
+<div class="field"><label>會議日期</label><input type="date" id="mDate"></div>
+<div class="field"><label>地點</label><input id="mRoom"></div>
+<div class="field"><label>狀態</label><select id="mStatus"><option>準備中</option><option>已完成</option></select></div>
+<div class="field full"><label>會議摘要 / 備註</label><textarea id="mNote" rows="4"></textarea></div>
+</div></div><div class="mf"><button class="btn light" onclick="closeMeeting()">取消</button><button class="btn primary" onclick="saveMeeting()">儲存</button></div></div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* 只要改這一行 */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzPOgJwnMrLszt4QUOqTPy98iDb8Mu03DoC7h695-HsX22P1SiYNKhwu5cCPzOtlHjzvg/exec";
+
+let tasks=[], meetings=[], categories={work:[],source:[]}, weeklySummary="";
+let editTaskId=null, editMeetingId=null;
+const today=new Date();
+
+function apiGet(action, params={}){
+  return new Promise((resolve,reject)=>{
+    const cb="cb_"+Date.now()+"_"+Math.floor(Math.random()*10000);
+    window[cb]=(data)=>{delete window[cb];script.remove();resolve(data)};
+    const q=new URLSearchParams({action,callback:cb,...params,_:Date.now()});
+    const script=document.createElement("script");
+    script.src=SCRIPT_URL+"?"+q.toString();
+    script.onerror=()=>{delete window[cb];script.remove();reject(new Error("連線失敗"))};
+    document.body.appendChild(script);
+  });
+}
+async function apiPost(payload){
+  await fetch(SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=UTF-8"},body:JSON.stringify(payload)});
+}
+function loading(v){document.getElementById("loading").classList.toggle("show",v)}
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1600)}
+function fmtDate(d){return d.toISOString().slice(0,10)}
+function dateZH(s){if(!s)return "—";const d=new Date(s+"T00:00:00");return `${d.getMonth()+1}/${d.getDate()}`}
+function sow(d){const x=new Date(d);const n=(x.getDay()+6)%7;x.setDate(x.getDate()-n);x.setHours(0,0,0,0);return x}
+function eow(d){const x=sow(d);x.setDate(x.getDate()+6);return x}
+function inWeek(s){const d=new Date(s+"T00:00:00");return d>=sow(today)&&d<=eow(today)}
+function isOverdue(t){return !["已完成","封存"].includes(t.status)&&t.dueDate&&new Date(t.dueDate+"T23:59:59")<today}
+function statusBadge(s){let c=s==="已完成"?"green":s==="待追蹤"?"purple":s==="等待回覆"?"orange":s==="待處理"?"blue":"";return `<span class="badge ${c}">${s}</span>`}
+function priBadge(p){let c=p==="緊急"?"red":p==="重要"?"orange":"";return `<span class="badge ${c}">${p||"一般"}</span>`}
+
+async function loadAll(){
+ if(!SCRIPT_URL.startsWith("https://script.google.com/")){toast("請先設定 SCRIPT_URL");return}
+ loading(true);
+ try{
+   const r=await apiGet("bootstrap");
+   if(!r.ok) throw new Error(r.message||"載入失敗");
+   tasks=r.tasks||[];meetings=r.meetings||[];categories=r.categories||{work:[],source:[]};weeklySummary=r.weeklySummary||"";
+   render();
+   document.getElementById("syncState").textContent="● 已同步 Google Sheets";
+   document.getElementById("syncTime").textContent="最後同步："+new Date().toLocaleTimeString("zh-TW",{hour:"2-digit",minute:"2-digit"});
+ }catch(e){toast("同步失敗："+e.message)}
+ finally{loading(false)}
+}
+function render(){
+ const s=sow(today), e=eow(today);
+ document.getElementById("weekText").textContent=`${fmtDate(s)} – ${fmtDate(e)}｜工作、會議、追蹤與主任週報`;
+ renderFilters();renderDashboard();renderWeekly();renderTasks();renderTracking();renderMeetings();renderSettings();
+}
+function renderFilters(){
+ const a=document.getElementById("sourceFilter"),b=document.getElementById("categoryFilter"),as=a.value,bs=b.value;
+ a.innerHTML='<option value="">全部來源</option>'+categories.source.map(x=>`<option>${x}</option>`).join("");
+ b.innerHTML='<option value="">全部分類</option>'+categories.work.map(x=>`<option>${x}</option>`).join("");
+ a.value=as;b.value=bs;
+}
+function renderDashboard(){
+ const wk=tasks.filter(t=>inWeek(t.createDate)),done=wk.filter(t=>t.status==="已完成").length,active=tasks.filter(t=>["待處理","處理中"].includes(t.status)).length,follow=tasks.filter(t=>["待追蹤","等待回覆"].includes(t.status)).length,od=tasks.filter(isOverdue).length,rate=wk.length?Math.round(done/wk.length*100):0;
+ document.getElementById("weekNo").textContent="本週";
+ document.getElementById("heroSummary").textContent=`本週新增 ${wk.length} 項工作，已完成 ${done} 項，完成率 ${rate}%；目前尚有 ${follow} 項待追蹤，${od} 項逾期。`;
+ document.getElementById("kpiCards").innerHTML=[["本週新增",wk.length,"本週建立"],["本週完成",done,`完成率 ${rate}%`],["進行中",active,"待處理 / 處理中"],["待追蹤",follow,"含等待回覆"],["逾期",od,"需優先處理"]].map(x=>`<div class="kpi"><div class="label">${x[0]}</div><div class="value">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join("");
+ document.getElementById("weekCountBadge").textContent=`本週 ${wk.length} 項`;
+ const counts=[0,0,0,0,0,0,0];wk.forEach(t=>counts[(new Date(t.createDate+"T00:00:00").getDay()+6)%7]++);
+ const max=Math.max(1,...counts),days=["一","二","三","四","五","六","日"];
+ document.getElementById("weekBar").innerHTML=counts.map((n,i)=>`<div class="bar-col"><div class="bar-wrap"><div class="bar" style="height:${Math.max(7,n/max*100)}%"><span class="n">${n}</span></div></div><small>${days[i]}</small></div>`).join("");
+ renderDonut("donutBox",wk,"category");renderSourceBars(wk);
+ const im=tasks.filter(t=>!["已完成","封存"].includes(t.status)).sort((a,b)=>(a.dueDate||"9999").localeCompare(b.dueDate||"9999")).slice(0,5);
+ document.getElementById("importantList").innerHTML=im.length?im.map(t=>`<div class="item"><div><h4>${t.title}</h4><div class="meta">${statusBadge(t.status)}${priBadge(t.priority)}<span class="badge">${t.source}</span></div></div><div class="date">${dateZH(t.dueDate)}</div></div>`).join(""):'<div class="empty">目前沒有待辦事項</div>';
+ document.getElementById("meetingListMini").innerHTML=meetings.slice().sort((a,b)=>a.date.localeCompare(b.date)).slice(0,4).map(m=>`<div class="item"><div><h4>${m.name}</h4><div class="meta"><span class="badge blue">${m.room||"未設定地點"}</span></div></div><div class="date">${dateZH(m.date)}</div></div>`).join("");
+}
+function renderDonut(id,arr,key){
+ const c={};arr.forEach(x=>c[x[key]]=(c[x[key]]||0)+1);const es=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,4),total=es.reduce((s,x)=>s+x[1],0),colors=["#2f63e9","#219a6a","#d77a1e","#7862dc"];let cur=0,parts=[];
+ es.forEach((e,i)=>{let p=total?e[1]/total*100:0;parts.push(`${colors[i]} ${cur}% ${cur+p}%`);cur+=p});
+ document.getElementById(id).innerHTML=!es.length?'<div class="empty">尚無資料</div>':`<div class="donut-wrap"><div style="position:relative"><div class="donut" style="background:conic-gradient(${parts.join(",")})"></div><div class="donut-center"><div><b>${total}</b><span>本週事項</span></div></div></div><div class="legend">${es.map((e,i)=>`<div class="legend-row"><span class="dot" style="background:${colors[i]}"></span><span>${e[0]}</span><b>${e[1]}</b></div>`).join("")}</div></div>`;
+}
+function renderSourceBars(arr){
+ const c={};arr.forEach(t=>c[t.source]=(c[t.source]||0)+1);const es=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,6),max=Math.max(1,...es.map(x=>x[1]));
+ document.getElementById("sourceBars").innerHTML=es.length?es.map(e=>`<div class="srow"><span>${e[0]}</span><div class="track"><div class="fill" style="width:${e[1]/max*100}%"></div></div><b>${e[1]}</b></div>`).join(""):'<div class="empty">尚無資料</div>';
+}
+function renderWeekly(){
+ const rpt=tasks.filter(t=>t.weeklyReport&&!["封存"].includes(t.status)),done=rpt.filter(t=>t.status==="已完成").length,follow=rpt.filter(t=>["待追蹤","等待回覆"].includes(t.status)).length,od=rpt.filter(isOverdue).length,rate=rpt.length?Math.round(done/rpt.length*100):0;
+ document.getElementById("weeklyKpis").innerHTML=[["列入週報",rpt.length,"週報重點"],["已完成",done,`完成率 ${rate}%`],["待追蹤",follow,"持續追蹤"],["逾期",od,"需掌握"],["會議相關",rpt.filter(t=>t.source!=="其他").length,"會議 / 交辦"]].map(x=>`<div class="kpi"><div class="label">${x[0]}</div><div class="value">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join("");
+ document.getElementById("weeklySummary").value=weeklySummary||`本週共列入週報 ${rpt.length} 項工作，已完成 ${done} 項，完成率 ${rate}%。目前尚有 ${follow} 項待追蹤，${od} 項逾期。`;
+ renderDonut("weeklyDonut",rpt,"category");
+ document.getElementById("weeklyTable").innerHTML=rpt.length?rpt.map(t=>`<tr><td><b>${t.title}</b></td><td>${t.source}</td><td>${t.weekProgress||"—"}</td><td>${statusBadge(t.status)}</td><td>${t.nextAction||"—"}</td><td><button class="mini blue" onclick="editTask('${t.id}')">編輯</button></td></tr>`).join(""):'<tr><td colspan="6">目前沒有週報資料</td></tr>';
+}
+function renderTasks(){
+ const q=(taskSearch.value||"").toLowerCase(),st=statusFilter.value,so=sourceFilter.value,ca=categoryFilter.value;
+ const arr=tasks.filter(t=>(!q||(t.title+t.note+t.weekProgress+t.nextAction+t.source+t.category).toLowerCase().includes(q))&&(!st||t.status===st)&&(!so||t.source===so)&&(!ca||t.category===ca));
+ taskTable.innerHTML=arr.length?arr.map(t=>`<tr><td><b>${t.title}</b><br><span style="color:#8a95a7;font-size:10px">${t.note||""}</span></td><td>${t.category}</td><td>${t.source}</td><td>${statusBadge(t.status)}</td><td>${dateZH(t.dueDate)} ${isOverdue(t)?'<span class="badge red">逾期</span>':''}</td><td>${t.weeklyReport?'<span class="badge green">是</span>':'—'}</td><td><div class="actions-cell"><button class="mini blue" onclick="editTask('${t.id}')">編輯</button><button class="mini" onclick="completeTask('${t.id}')">完成</button></div></td></tr>`).join(""):'<tr><td colspan="7">沒有符合條件的資料</td></tr>';
+ dataTable.innerHTML=tasks.map(t=>`<tr><td><b>${t.title}</b></td><td>${t.category}</td><td>${t.source}</td><td>${statusBadge(t.status)}</td><td>${priBadge(t.priority)}</td><td>${t.weeklyReport?'<span class="badge green">列入</span>':'—'}</td><td><div class="actions-cell"><button class="mini blue" onclick="editTask('${t.id}')">編輯</button><button class="mini" onclick="toggleReport('${t.id}')">${t.weeklyReport?'移出週報':'列入週報'}</button><button class="mini red" onclick="deleteTask('${t.id}')">刪除</button></div></td></tr>`).join("");
+}
+function renderTracking(){
+ const arr=tasks.filter(t=>["待追蹤","等待回覆"].includes(t.status)||isOverdue(t)).sort((a,b)=>(a.dueDate||"9999").localeCompare(b.dueDate||"9999"));
+ trackingKpis.innerHTML=[["等待回覆",tasks.filter(t=>t.status==="等待回覆").length,"待確認"],["待追蹤",tasks.filter(t=>t.status==="待追蹤").length,"需再次追蹤"],["逾期",tasks.filter(isOverdue).length,"超過期限"],["跨週",arr.filter(t=>!inWeek(t.createDate)).length,"前週延續"],["本週完成",tasks.filter(t=>inWeek(t.createDate)&&t.status==="已完成").length,"已結案"]].map(x=>`<div class="kpi"><div class="label">${x[0]}</div><div class="value">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join("");
+ trackingList.innerHTML=arr.length?arr.map(t=>`<div class="item"><div><h4>${t.title}</h4><div class="meta">${statusBadge(t.status)}${priBadge(t.priority)}<span class="badge">${t.source}</span></div></div><div class="date">${dateZH(t.dueDate)}<br><button class="mini blue" onclick="editTask('${t.id}')">編輯</button></div></div>`).join(""):'<div class="empty">目前沒有待追蹤事項</div>';
+}
+function renderMeetings(){
+ meetingCards.innerHTML=meetings.length?meetings.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(m=>`<div class="panel"><div class="ph"><div><span class="badge blue">${dateZH(m.date)}</span><h3 style="margin-top:8px">${m.name}</h3><p>${m.room||"未設定地點"}</p></div><span class="badge">${m.status}</span></div><div style="padding:15px 17px;font-size:11px;color:var(--muted)">${m.note||"尚未填寫摘要"}</div><div style="padding:0 17px 16px;display:flex;gap:7px"><button class="mini blue" onclick="editMeeting('${m.id}')">編輯</button><button class="mini" onclick="newTaskFromMeeting('${m.name.replaceAll("'","\\'")}')">建立工作</button><button class="mini red" onclick="deleteMeeting('${m.id}')">刪除</button></div></div>`).join(""):'<div class="empty">尚無會議</div>';
+}
+function renderSettings(){
+ workCats.innerHTML=categories.work.map(x=>`<span class="chip">${x}<button onclick="deleteCat('WORK','${x.replaceAll("'","\\'")}')">×</button></span>`).join("");
+ sourceCats.innerHTML=categories.source.map(x=>`<span class="chip">${x}<button onclick="deleteCat('SOURCE','${x.replaceAll("'","\\'")}')">×</button></span>`).join("");
+}
+function switchView(id){document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.v===id));side.classList.remove("show")}
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>switchView(b.dataset.v));
+["taskSearch","statusFilter","sourceFilter","categoryFilter"].forEach(id=>document.getElementById(id).addEventListener(id==="taskSearch"?"input":"change",renderTasks));
+globalSearch.addEventListener("input",e=>{if(e.target.value){switchView("tasks");taskSearch.value=e.target.value;renderTasks()}});
+
+function fillTaskSelects(){fCat.innerHTML=categories.work.map(x=>`<option>${x}</option>`).join("");fSource.innerHTML=categories.source.map(x=>`<option>${x}</option>`).join("")}
+function openTask(id=null,sourcePreset=null){
+ editTaskId=id;fillTaskSelects();const t=id?tasks.find(x=>x.id===id):null;taskModalTitle.textContent=t?"編輯工作":"新增工作";
+ fTitle.value=t?.title||"";fCat.value=t?.category||categories.work[0]||"";fSource.value=sourcePreset||t?.source||categories.source[0]||"";fStatus.value=t?.status||"待處理";fPriority.value=t?.priority||"一般";fCreate.value=t?.createDate||fmtDate(today);fDue.value=t?.dueDate||fmtDate(today);fNote.value=t?.note||"";fProgress.value=t?.weekProgress||"";fNext.value=t?.nextAction||"";fAttachment.value=t?.attachmentUrl||"";fReport.checked=!!t?.weeklyReport;taskModal.classList.add("show");
+}
+function closeTask(){taskModal.classList.remove("show")}
+async function saveTask(){
+ const title=fTitle.value.trim();if(!title){toast("請輸入工作事項");return}
+ loading(true);
+ try{
+   await apiPost({action:editTaskId?"updateTask":"addTask",id:editTaskId||"",title,category:fCat.value,source:fSource.value,status:fStatus.value,priority:fPriority.value,createDate:fCreate.value,dueDate:fDue.value,note:fNote.value,weekProgress:fProgress.value,nextAction:fNext.value,weeklyReport:fReport.checked,attachmentUrl:fAttachment.value});
+   closeTask();await delayAndReload();toast(editTaskId?"工作已更新":"工作已新增");
+ }finally{loading(false)}
+}
+function editTask(id){openTask(id)}
+async function completeTask(id){const t=tasks.find(x=>x.id===id);if(!t)return;await apiPost({action:"updateTask",...t,status:"已完成"});await delayAndReload();toast("已標記完成")}
+async function toggleReport(id){const t=tasks.find(x=>x.id===id);if(!t)return;await apiPost({action:"updateTask",...t,weeklyReport:!t.weeklyReport});await delayAndReload()}
+async function deleteTask(id){if(confirm("確定刪除此工作？")){await apiPost({action:"deleteTask",id});await delayAndReload();toast("工作已刪除")}}
+
+function openMeeting(id=null){
+ editMeetingId=id;const m=id?meetings.find(x=>x.id===id):null;meetingModalTitle.textContent=m?"編輯會議":"新增會議";mName.value=m?.name||"";mDate.value=m?.date||fmtDate(today);mRoom.value=m?.room||"";mStatus.value=m?.status||"準備中";mNote.value=m?.note||"";meetingModal.classList.add("show");
+}
+function closeMeeting(){meetingModal.classList.remove("show")}
+async function saveMeeting(){if(!mName.value.trim()){toast("請輸入會議名稱");return}await apiPost({action:editMeetingId?"updateMeeting":"addMeeting",id:editMeetingId||"",name:mName.value,date:mDate.value,room:mRoom.value,status:mStatus.value,note:mNote.value});closeMeeting();await delayAndReload();toast("會議已儲存")}
+function editMeeting(id){openMeeting(id)}
+async function deleteMeeting(id){if(confirm("確定刪除此會議？")){await apiPost({action:"deleteMeeting",id});await delayAndReload()}}
+function newTaskFromMeeting(name){openTask(null,name)}
+
+async function addCat(type){
+ const inp=type==="WORK"?newWorkCat:newSourceCat,v=inp.value.trim();if(!v)return;await apiPost({action:"addCategory",type,name:v});inp.value="";await delayAndReload();toast("分類已新增")
+}
+async function deleteCat(type,name){if(confirm(`確定刪除「${name}」？`)){await apiPost({action:"deleteCategory",type,name});await delayAndReload()}}
+async function saveWeeklySummary(){await apiPost({action:"saveWeeklySummary",weekId:getWeekId(),summary:weeklySummary.value});await delayAndReload();toast("主任摘要已儲存")}
+function getWeekId(){const d=sow(today);return `${d.getFullYear()}-W${String(Math.ceil((((d-new Date(d.getFullYear(),0,1))/86400000)+new Date(d.getFullYear(),0,1).getDay()+1)/7)).padStart(2,"0")}`}
+function delay(ms){return new Promise(r=>setTimeout(r,ms))}
+async function delayAndReload(){await delay(650);await loadAll()}
+
+loadAll();
+</script>
+</body>
+</html>
